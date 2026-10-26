@@ -1,0 +1,47 @@
+# Mesa de ayuda (Java)
+
+Sistema de gestión de tickets de soporte técnico hecho en Java para practicar patrones de diseño
+(State, Strategy y Observer), pruebas con JUnit y modelado de datos.
+
+## Estado del proyecto
+Día 1: modelo de datos.
+
+## Modelo de clases
+
+```mermaid
+classDiagram
+    class Ticket {
+        -int id
+        -String titulo
+        -String descripcion
+        -Prioridad prioridad
+        -Categoria categoria
+        -LocalDateTime fechaCreacion
+        +asignarA(Tecnico t)
+        +agregarComentario(Comentario c)
+    }
+    class Usuario {
+        <<record>>
+        int id
+        String nombre
+        String email
+    }
+    class Tecnico {
+        <<record>>
+        int id
+        String nombre
+        NivelSoporte nivel
+    }
+    class Comentario {
+        <<record>>
+        String autor
+        String texto
+        LocalDateTime fecha
+    }
+    Ticket --> Usuario : solicitante
+    Ticket --> Tecnico : atiende
+    Ticket "1" *-- "0..*" Comentario
+```
+
+## Próximo paso
+Patrón State para el estado del ticket.
