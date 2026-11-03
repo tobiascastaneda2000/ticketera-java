@@ -17,6 +17,7 @@ public class Ticket {
 	private final Usuario solicitante;
 	private Tecnico tecnico;
 	private List<Comentario> comentarios = new ArrayList<>();
+	private EstadoTicket estado;
 
 	public Categoria getCategoria() {
 		return categoria;
@@ -68,6 +69,7 @@ public class Ticket {
 		this.categoria = Objects.requireNonNull(categoria, "Categoria no puede ser null");
 		this.solicitante = Objects.requireNonNull(solicitante, "Solicitante no puede ser null");
 		this.fechaCreacion = LocalDateTime.now();
+		this.estado = new EstadoAbierto();
 	}
 
 	public List<Comentario> getComentarios() {
@@ -83,11 +85,21 @@ public class Ticket {
 		comentarios.add(c);
 	}
 	
+	public void reabrir() { estado.reabrir(this); }
+	
+	public void transicionarEstado() { estado.avanzar(this); }
+
+	void cambiarEstado(EstadoTicket nuevoEstado) { this.estado = nuevoEstado; }
+	
 	@Override
     public String toString() {
         String atiende = tecnico == null ? "sin asignar" : tecnico.getNombre();
-        return String.format("#%d [%s] %s (%s) | solicitante: %s | técnico: %s",
-                id, prioridad, titulo, categoria, solicitante.getNombre(), atiende);
+		return String.format("#%d [%s | %s] %s (%s) | solicitante: %s | técnico: %s",
+				id, prioridad, getEstado(), titulo, categoria, solicitante.getNombre(), atiende);
     }
+
+	public Estado getEstado() {
+		return estado.comoEnum();
+	}
 
 }
