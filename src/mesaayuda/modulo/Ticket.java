@@ -101,5 +101,9 @@ public class Ticket {
 	public Estado getEstado() {
 		return estado.comoEnum();
 	}
+	
+	public boolean esActivo() {
+		return estado.comoEnum() == Estado.ABIERTO || estado.comoEnum() == Estado.EN_CURSO;
+	}
 
 }

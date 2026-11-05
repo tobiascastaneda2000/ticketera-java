@@ -1,42 +1,64 @@
 package mesaayuda.app;
 
+// Imports del dominio y de las estrategias que se muestran en la demo
+import java.util.Arrays;
+import java.util.List;
+
 import mesaayuda.modulo.Categoria;
-import mesaayuda.modulo.Comentario;
+import mesaayuda.modulo.EstrategiaAsignacionMenorCarga;
+import mesaayuda.modulo.EstrategiaAsignacionRotativa;
+import mesaayuda.modulo.GestorDeTickets;
 import mesaayuda.modulo.NivelSoporte;
 import mesaayuda.modulo.Prioridad;
 import mesaayuda.modulo.Tecnico;
 import mesaayuda.modulo.Ticket;
 import mesaayuda.modulo.Usuario;
 
-// Prueba de aceptación del modelo: tres comprobaciones
 public class Main {
 
     public static void main(String[] args) {
-        Usuario ana = new Usuario(1, "Ana Gómez", "ana@empresa.local");
+        Usuario solicitante = new Usuario(1, "Ana Gómez", "ana@empresa.local");
+
         Tecnico luis = new Tecnico(1, "Luis Pérez", NivelSoporte.N1);
+        Tecnico sol = new Tecnico(2, "Sol Díaz", NivelSoporte.N1);
+        Tecnico marco = new Tecnico(3, "Marco Ruiz", NivelSoporte.N2);
 
-        // 1. Caso válido
-        Ticket ticket = new Ticket(1, "No puedo iniciar sesión", "Dice que mi cuenta está bloqueada",
-                Prioridad.ALTA, Categoria.CUENTA, ana);
-        ticket.asignarA(luis);
-        ticket.agregarComentario(new Comentario("Luis Pérez", "Reviso la cuenta en AD."));
-        System.out.println(ticket);
-        ticket.getComentarios().forEach(System.out::println);
+        List<Tecnico> tecnicos = Arrays.asList(luis, sol, marco);
+        GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        // 2. Título vacío: tiene que lanzar IllegalArgumentException
-        try {
-            new Ticket(2, "  ", "", Prioridad.BAJA, Categoria.OTROS, ana);
-            System.out.println("ERROR: debió fallar con título vacío");
-        } catch (IllegalArgumentException e) {
-            System.out.println("OK título vacío: " + e.getMessage());
+        // Demo de Strategy: la regla rotativa reparte los tickets en orden
+        gestor.setEstrategiaAsignacion(new EstrategiaAsignacionRotativa());
+
+        gestor.crearTicket("No puedo iniciar sesión", "La cuenta está bloqueada",
+                Prioridad.ALTA, Categoria.CUENTA, solicitante);
+        gestor.crearTicket("La computadora no enciende", "No prende",
+                Prioridad.MEDIA, Categoria.HARDWARE, solicitante);
+        gestor.crearTicket("No funciona el correo", "No puedo enviar mensajes",
+                Prioridad.MEDIA, Categoria.SOFTWARE, solicitante);
+        gestor.crearTicket("Problema con la red", "Se corta la conexión",
+                Prioridad.BAJA, Categoria.RED, solicitante);
+
+        List<Ticket> tickets = gestor.getRepositorioDeTickets();
+
+        // Asignamos los cuatro últimos tickets: Luis, Sol, Marco y nuevamente Luis
+        int primerTicketDeEstaDemo = tickets.size() - 4;
+        for (int i = primerTicketDeEstaDemo; i < tickets.size(); i++) {
+            gestor.asignarTicket(tickets.get(i), tecnicos);
+            System.out.println(tickets.get(i));
         }
 
-        // 3. La lista de comentarios no se puede modificar desde afuera
-        try {
-            ticket.getComentarios().clear();
-            System.out.println("ERROR: la lista no debería poder modificarse");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("OK lista de solo lectura");
-        }
+        // Demo de Strategy: la regla de menor carga elige al técnico con menos tickets activos
+        gestor.setEstrategiaAsignacion(new EstrategiaAsignacionMenorCarga());
+
+        gestor.crearTicket("No abre el sistema de ventas", "Aparece un error",
+                Prioridad.ALTA, Categoria.SOFTWARE, solicitante);
+
+        Ticket ticketParaMenorCarga =
+                gestor.getRepositorioDeTickets().get(
+                        gestor.getRepositorioDeTickets().size() - 1
+                );
+
+        gestor.asignarTicket(ticketParaMenorCarga, tecnicos);
+        System.out.println("Asignado con menor carga: " + ticketParaMenorCarga);
     }
 }

@@ -1,5 +1,7 @@
 package mesaayuda.modulo;
 
+import java.util.List;
+
 public class Tecnico {
 	int id;
     String nombre;
@@ -22,4 +24,5 @@ public class Tecnico {
 	public NivelSoporte getNivel() {
 		return nivel;
 	}
+	
 }

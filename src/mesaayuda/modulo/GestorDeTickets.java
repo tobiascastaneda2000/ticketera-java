@@ -10,6 +10,7 @@ public class GestorDeTickets {
 	
 	private final List<Ticket> repositorioDeTickets = new ArrayList<>();
 	private int siguienteId = 1;
+	private EstrategiaAsignacion estrategiaAsignacion;
 	
 	// Constructor privado
 	private GestorDeTickets() {
@@ -30,6 +31,25 @@ public class GestorDeTickets {
 	public void crearTicket(String t, String d, Prioridad p, Categoria c, Usuario u) {
 		Ticket ticket = new Ticket(siguienteId++, t, d, p, c, u);
 		this.repositorioDeTickets.add(ticket);
+	}
+	
+	public void setEstrategiaAsignacion(EstrategiaAsignacion estrategia) {
+	    if (estrategia == null) {
+	        throw new IllegalArgumentException("La estrategia no puede ser null");
+	    }
+	    this.estrategiaAsignacion = estrategia;
+	}
+
+	public void asignarTicket(Ticket ticket, List<Tecnico> tecnicos) {
+	    if (estrategiaAsignacion == null) {
+	        throw new IllegalStateException("Primero elegí una estrategia de asignación");
+	    }
+
+	    estrategiaAsignacion.asignarTecnico(
+	            ticket,
+	            tecnicos,
+	            repositorioDeTickets
+	    );
 	}
 
 
