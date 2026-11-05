@@ -1,6 +1,6 @@
 package mesaayuda.app;
 
-// Imports del dominio y de las estrategias que se muestran en la demo
+// Colecciones para armar los equipos y recorrer tickets
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +9,9 @@ import mesaayuda.modulo.EstrategiaAsignacionMenorCarga;
 import mesaayuda.modulo.EstrategiaAsignacionRotativa;
 import mesaayuda.modulo.GestorDeTickets;
 import mesaayuda.modulo.NivelSoporte;
+import mesaayuda.modulo.NotificadorTecnico;
+import mesaayuda.modulo.NotificadorUsuario;
+import mesaayuda.modulo.ObservadorTicket;
 import mesaayuda.modulo.Prioridad;
 import mesaayuda.modulo.Tecnico;
 import mesaayuda.modulo.Ticket;
@@ -26,7 +29,11 @@ public class Main {
         List<Tecnico> tecnicos = Arrays.asList(luis, sol, marco);
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        // Demo de Strategy: la regla rotativa reparte los tickets en orden
+        // Observer: creamos objetos que van a reaccionar a los cambios del ticket
+        ObservadorTicket notificadorUsuario = new NotificadorUsuario();
+        ObservadorTicket notificadorTecnico = new NotificadorTecnico();
+
+        // Strategy: la regla rotativa reparte los tickets entre los técnicos
         gestor.setEstrategiaAsignacion(new EstrategiaAsignacionRotativa());
 
         gestor.crearTicket("No puedo iniciar sesión", "La cuenta está bloqueada",
@@ -39,15 +46,23 @@ public class Main {
                 Prioridad.BAJA, Categoria.RED, solicitante);
 
         List<Ticket> tickets = gestor.getRepositorioDeTickets();
-
-        // Asignamos los cuatro últimos tickets: Luis, Sol, Marco y nuevamente Luis
         int primerTicketDeEstaDemo = tickets.size() - 4;
+
+        // Registramos observadores y asignamos los cuatro tickets
         for (int i = primerTicketDeEstaDemo; i < tickets.size(); i++) {
-            gestor.asignarTicket(tickets.get(i), tecnicos);
-            System.out.println(tickets.get(i));
+            Ticket ticket = tickets.get(i);
+            ticket.agregarObservador(notificadorUsuario);
+            ticket.agregarObservador(notificadorTecnico);
+
+            gestor.asignarTicket(ticket, tecnicos);
+            System.out.println(ticket);
         }
 
-        // Demo de Strategy: la regla de menor carga elige al técnico con menos tickets activos
+        // Observer: el cambio de estado también genera una notificación
+        Ticket ticketParaAvanzar = tickets.get(primerTicketDeEstaDemo);
+        ticketParaAvanzar.transicionarEstado();
+
+        // Strategy: cambiamos la regla para usar menor carga
         gestor.setEstrategiaAsignacion(new EstrategiaAsignacionMenorCarga());
 
         gestor.crearTicket("No abre el sistema de ventas", "Aparece un error",
@@ -57,6 +72,9 @@ public class Main {
                 gestor.getRepositorioDeTickets().get(
                         gestor.getRepositorioDeTickets().size() - 1
                 );
+
+        ticketParaMenorCarga.agregarObservador(notificadorUsuario);
+        ticketParaMenorCarga.agregarObservador(notificadorTecnico);
 
         gestor.asignarTicket(ticketParaMenorCarga, tecnicos);
         System.out.println("Asignado con menor carga: " + ticketParaMenorCarga);

@@ -18,6 +18,7 @@ public class Ticket {
 	private Tecnico tecnico;
 	private List<Comentario> comentarios = new ArrayList<>();
 	private EstadoTicket estado;
+	private final List<ObservadorTicket> observadores = new ArrayList<>();
 
 	public Categoria getCategoria() {
 		return categoria;
@@ -50,13 +51,24 @@ public class Ticket {
 	public Tecnico getTecnico() {
 		return tecnico;
 	}
-
+	
+	// 1. Sin descripción, sin observadores
 	public Ticket(int id, String titulo, Prioridad prioridad, Categoria categoria, Usuario solicitante) {
-		this(id, titulo, "", prioridad, categoria, solicitante);
+		this(id, titulo, "", prioridad, categoria, solicitante, null);
+	}
+	
+	// 2. Sin descripción, con observadores
+	public Ticket(int id, String titulo, Prioridad prioridad, Categoria categoria, Usuario solicitante, List<ObservadorTicket> observadores) {
+	    this(id, titulo, "", prioridad, categoria, solicitante, observadores);
 	}
 
+	// 3. Con descripción, sin observadores
+	public Ticket(int id, String titulo, String descripcion, Prioridad prioridad, Categoria categoria, Usuario solicitante) {
+	    this(id, titulo, descripcion, prioridad, categoria, solicitante, null);
+	}
+	// 4. Con descripción y observadores
 	public Ticket(int id, String titulo, String descripcion, Prioridad prioridad, Categoria categoria,
-			Usuario solicitante) {
+			Usuario solicitante, List<ObservadorTicket> observadores) {
 		
 		if (titulo == null || titulo.isBlank()) {
             throw new IllegalArgumentException("El título no puede estar vacío");
@@ -70,6 +82,9 @@ public class Ticket {
 		this.solicitante = Objects.requireNonNull(solicitante, "Solicitante no puede ser null");
 		this.fechaCreacion = LocalDateTime.now();
 		this.estado = new EstadoAbierto();
+		if (observadores != null) {
+			this.observadores.addAll(observadores);
+		}
 	}
 
 	public List<Comentario> getComentarios() {
@@ -77,17 +92,29 @@ public class Ticket {
 	}
 
 	public void asignarA(Tecnico t) {
-		tecnico = Objects.requireNonNull(t, "Tecnico no puede ser null");
-		;
+		this.tecnico = Objects.requireNonNull(t, "Tecnico no puede ser null");
+		notificarObservadores("Ticket asignado a " + this.tecnico.getNombre());
 	}
 
 	public void agregarComentario(Comentario c) {
 		comentarios.add(c);
 	}
 	
-	public void reabrir() { estado.reabrir(this); }
+	public void reabrir() {
+		estado.reabrir(this);
+		notificarObservadores("El ticket cambió a " + getEstado());
+	}
 	
-	public void transicionarEstado() { estado.avanzar(this); }
+	public void transicionarEstado() {
+		this.estado.avanzar(this);
+		notificarObservadores("El ticket cambió a " + getEstado());
+	}
+
+	private void notificarObservadores(String evento) {
+		for (ObservadorTicket observador : new ArrayList<>(observadores)) {
+			observador.actualizar(this, evento);
+		}
+	}
 
 	void cambiarEstado(EstadoTicket nuevoEstado) { this.estado = nuevoEstado; }
 	
@@ -105,5 +132,13 @@ public class Ticket {
 	public boolean esActivo() {
 		return estado.comoEnum() == Estado.ABIERTO || estado.comoEnum() == Estado.EN_CURSO;
 	}
-
+	
+	public void agregarObservador(ObservadorTicket observador) {
+		this.observadores.add(Objects.requireNonNull(observador, "Observador no puede ser null"));
+	}
+	
+	public void quitarObservador(ObservadorTicket observador) {
+		this.observadores.remove(observador);
+	}
+		
 }
