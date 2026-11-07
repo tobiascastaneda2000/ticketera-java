@@ -67,6 +67,30 @@ public class GestorDeTickets {
 	public List<ComandoTicket> getHistorialComandos() {
 	    return Collections.unmodifiableList(historialComandos);
 	}
+	
+	public Ticket buscarTicketPorId(int id) {
+	    return repositorioDeTickets.stream().filter(ticket -> ticket.getId() == id).findFirst()
+	            .orElseThrow(
+	            		() ->new IllegalArgumentException("No existe un ticket con ID " + id)
+	            );
+	}
+
+	public List<Ticket> buscarTicketsPorEstado(Estado estado) {
+	    if (estado == null) {
+	        throw new IllegalArgumentException("El estado no puede ser null");
+	    }
+
+	    // Stream.toList() devuelve una lista que no se puede modificar
+	    return repositorioDeTickets.stream().filter(ticket -> ticket.getEstado() == estado).toList();
+	}
+
+	public List<Ticket> buscarTicketsPorTecnico(Tecnico tecnico) {
+	    if (tecnico == null) {
+	        throw new IllegalArgumentException("El técnico no puede ser null");
+	    }
+
+	    return repositorioDeTickets.stream().filter(ticket -> ticket.getTecnico() == tecnico).toList();
+	}
 
 
 }

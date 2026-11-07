@@ -129,5 +129,16 @@ public class Main {
              + ticketAsignadoPorComando);
      System.out.println("Comandos registrados: "
              + gestor.getHistorialComandos().size());
+     
+  // Buscamos el ticket asignado por su técnico
+     List<Ticket> ticketsDeLuis =
+             gestor.buscarTicketsPorTecnico(luis);
+
+     System.out.println("Tickets asignados a Luis:");
+     ticketsDeLuis.forEach(System.out::println);
+
+     // Buscamos e imprimimos un ticket por su ID
+     Ticket encontrado = gestor.buscarTicketPorId(ticketParaAvanzar.getId());
+     System.out.println("Ticket encontrado: " + encontrado);
     }
 }
