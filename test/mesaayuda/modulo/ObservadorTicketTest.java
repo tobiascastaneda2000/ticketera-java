@@ -83,7 +83,9 @@ class ObservadorTicketTest {
         assertTrue(observador.eventos.get(0).contains("ABIERTO"));
     }
 
-    // Comprueba que quitar un observador impida que reciba nuevos avisos
+   
+    
+ // Al quitar un observador, deja de recibir los eventos siguientes
     @Test
     void observadorQuitadoNoRecibeNotificaciones() {
         Ticket ticket = crearTicket();
@@ -91,6 +93,7 @@ class ObservadorTicketTest {
 
         ticket.agregarObservador(observador);
         ticket.quitarObservador(observador);
+
         ticket.transicionarEstado();
 
         assertTrue(observador.eventos.isEmpty());
