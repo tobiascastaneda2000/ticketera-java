@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import mesaayuda.modulo.Categoria;
+import mesaayuda.modulo.ComandoAvanzarEstado;
+import mesaayuda.modulo.ComandoReabrirTicket;
+import mesaayuda.modulo.ComandoTicket;
 import mesaayuda.modulo.EstrategiaAsignacionMenorCarga;
 import mesaayuda.modulo.EstrategiaAsignacionRotativa;
 import mesaayuda.modulo.GestorDeTickets;
@@ -60,7 +63,8 @@ public class Main {
 
         // Observer: el cambio de estado también genera una notificación
         Ticket ticketParaAvanzar = tickets.get(primerTicketDeEstaDemo);
-        ticketParaAvanzar.transicionarEstado();
+        ComandoTicket comando = new ComandoAvanzarEstado(ticketParaAvanzar);
+        gestor.ejecutarComando(comando);
 
         // Strategy: cambiamos la regla para usar menor carga
         gestor.setEstrategiaAsignacion(new EstrategiaAsignacionMenorCarga());
@@ -78,5 +82,24 @@ public class Main {
 
         gestor.asignarTicket(ticketParaMenorCarga, tecnicos);
         System.out.println("Asignado con menor carga: " + ticketParaMenorCarga);
+        
+     // ticketParaAvanzar ya está en EN_CURSO.
+     // Avanzamos a RESUELTO.
+     ComandoTicket comandoResolver =
+             new ComandoAvanzarEstado(ticketParaAvanzar);
+     gestor.ejecutarComando(comandoResolver);
+
+     // Avanzamos de RESUELTO a CERRADO.
+     ComandoTicket comandoCerrar =
+             new ComandoAvanzarEstado(ticketParaAvanzar);
+     gestor.ejecutarComando(comandoCerrar);
+
+     // Ahora se puede reabrir porque está CERRADO.
+     ComandoTicket comandoReabrir =
+             new ComandoReabrirTicket(ticketParaAvanzar);
+     gestor.ejecutarComando(comandoReabrir);
+
+     System.out.println("Estado final: " + ticketParaAvanzar.getEstado());
+     System.out.println("Comandos ejecutados: " + gestor.getHistorialComandos().size());
     }
 }

@@ -12,6 +12,8 @@ public class GestorDeTickets {
 	private int siguienteId = 1;
 	private EstrategiaAsignacion estrategiaAsignacion;
 	
+	private final List<ComandoTicket> historialComandos = new ArrayList<>();
+	
 	// Constructor privado
 	private GestorDeTickets() {
 	}
@@ -50,6 +52,20 @@ public class GestorDeTickets {
 	            tecnicos,
 	            repositorioDeTickets
 	    );
+	}
+	
+	public void ejecutarComando(ComandoTicket comando) {
+	    if (comando == null) {
+	        throw new IllegalArgumentException("El comando no puede ser null");
+	    }
+
+	    // Si esto falla, la línea siguiente no se ejecuta y no se guarda el comando
+	    comando.ejecutarComando();
+	    historialComandos.add(comando);
+	}
+
+	public List<ComandoTicket> getHistorialComandos() {
+	    return Collections.unmodifiableList(historialComandos);
 	}
 
 
