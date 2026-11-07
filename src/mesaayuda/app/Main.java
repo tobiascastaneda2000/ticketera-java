@@ -19,6 +19,7 @@ import mesaayuda.modulo.Prioridad;
 import mesaayuda.modulo.Tecnico;
 import mesaayuda.modulo.Ticket;
 import mesaayuda.modulo.Usuario;
+import mesaayuda.modulo.ComandoAsignarTecnico;
 
 public class Main {
 
@@ -101,5 +102,32 @@ public class Main {
 
      System.out.println("Estado final: " + ticketParaAvanzar.getEstado());
      System.out.println("Comandos ejecutados: " + gestor.getHistorialComandos().size());
+     
+  // Command: el comando representa la acción de asignar un técnico
+     gestor.crearTicket(
+             "Configurar acceso a la VPN",
+             "El usuario necesita conectarse desde su casa",
+             Prioridad.MEDIA,
+             Categoria.RED,
+             solicitante
+     );
+
+     Ticket ticketAsignadoPorComando =
+             gestor.getRepositorioDeTickets().get(
+                     gestor.getRepositorioDeTickets().size() - 1
+             );
+
+     ticketAsignadoPorComando.agregarObservador(notificadorUsuario);
+     ticketAsignadoPorComando.agregarObservador(notificadorTecnico);
+
+     ComandoTicket comandoAsignar =
+             new ComandoAsignarTecnico(ticketAsignadoPorComando, luis);
+
+     gestor.ejecutarComando(comandoAsignar);
+
+     System.out.println("Asignación ejecutada con Command: "
+             + ticketAsignadoPorComando);
+     System.out.println("Comandos registrados: "
+             + gestor.getHistorialComandos().size());
     }
 }

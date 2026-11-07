@@ -54,4 +54,16 @@ class ComandoTicketTest {
 
         assertThrows(IllegalStateException.class, comando::ejecutarComando);
     }
+    
+ // El comando asigna al técnico indicado al ticket
+    @Test
+    void comandoAsignarTecnicoAsignaElTecnico() {
+        Ticket ticket = crearTicket();
+        Tecnico tecnico = new Tecnico(2, "Luis Pérez", NivelSoporte.N1);
+        ComandoTicket comando = new ComandoAsignarTecnico(ticket, tecnico);
+
+        comando.ejecutarComando();
+
+        assertEquals(tecnico, ticket.getTecnico());
+    }
 }
