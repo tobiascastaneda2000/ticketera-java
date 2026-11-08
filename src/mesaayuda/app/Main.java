@@ -140,5 +140,12 @@ public class Main {
      // Buscamos e imprimimos un ticket por su ID
      Ticket encontrado = gestor.buscarTicketPorId(ticketParaAvanzar.getId());
      System.out.println("Ticket encontrado: " + encontrado);
+     
+  // Buscamos e imprimimos los tickets de prioridad alta
+     List<Ticket> ticketsAlta =
+             gestor.buscarTicketsPorPrioridad(Prioridad.ALTA);
+
+     System.out.println("Tickets de prioridad alta:");
+     ticketsAlta.forEach(System.out::println);
     }
 }

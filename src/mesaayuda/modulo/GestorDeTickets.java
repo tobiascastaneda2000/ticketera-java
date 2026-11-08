@@ -91,6 +91,14 @@ public class GestorDeTickets {
 
 	    return repositorioDeTickets.stream().filter(ticket -> ticket.getTecnico() == tecnico).toList();
 	}
+	
+	public List<Ticket> buscarTicketsPorPrioridad(Prioridad prioridad){
+		if (prioridad == null) {
+	        throw new IllegalArgumentException("La prioridad no puede ser null");
+	    }
+		
+		return repositorioDeTickets.stream().filter(ticket -> ticket.getPrioridad() == prioridad).toList();
+	}
 
 
 }

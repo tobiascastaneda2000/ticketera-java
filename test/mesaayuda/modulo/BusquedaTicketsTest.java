@@ -101,4 +101,39 @@ class BusquedaTicketsTest {
                 () -> gestor.buscarTicketsPorTecnico(null)
         );
     }
+    
+    
+ // La búsqueda por técnico devuelve tickets asignados a esa instancia
+    @Test
+    void buscaTicketsPorPrioridad() {
+        GestorDeTickets gestor = GestorDeTickets.getInstance();
+
+        gestor.crearTicket(
+                "Busqueda prioridad alta",
+                "Descripción de prueba",
+                Prioridad.ALTA,
+                Categoria.SOFTWARE,
+                crearUsuario()
+        );
+
+        List<Ticket> tickets = gestor.getRepositorioDeTickets();
+        Ticket ticketCreado = tickets.get(tickets.size() - 1);
+
+        List<Ticket> encontrados =
+                gestor.buscarTicketsPorPrioridad(Prioridad.ALTA);
+
+        assertTrue(encontrados.contains(ticketCreado));
+        assertEquals(Prioridad.ALTA, ticketCreado.getPrioridad());
+    }
+    
+    // No se puede buscar por una prioridad null
+    @Test
+    void prioridadNullLanzaExcepcion() {
+        GestorDeTickets gestor = GestorDeTickets.getInstance();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gestor.buscarTicketsPorPrioridad(null)
+        );
+    }
 }
