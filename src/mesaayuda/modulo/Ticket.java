@@ -98,6 +98,7 @@ public class Ticket {
 
 	public void agregarComentario(Comentario c) {
 		comentarios.add(c);
+		notificarObservadores("Nuevo Comentario - " + "Autor: " + c.autor + " - Texto: " + c.texto);
 	}
 	
 	public void reabrir() {

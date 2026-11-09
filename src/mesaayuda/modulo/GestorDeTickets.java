@@ -99,6 +99,33 @@ public class GestorDeTickets {
 		
 		return repositorioDeTickets.stream().filter(ticket -> ticket.getPrioridad() == prioridad).toList();
 	}
+	
+	
+	//Busqueda por texto
+	public List<Ticket> buscarTicketsPorTexto(String texto){
+		if (texto == null || texto.trim().isEmpty()) {
+	        throw new IllegalArgumentException("El texto no puede ser null");
+	    }
+		
+		return this.repositorioDeTickets.stream().filter(
+				ticket -> ticket.getTitulo().toLowerCase().contains(texto.toLowerCase()) || 
+				ticket.getDescripcion().toLowerCase().contains(texto.toLowerCase()) || 
+				ticket.getComentarios().stream().anyMatch(
+						comentario -> comentario.getTexto().toLowerCase().contains(texto.toLowerCase())
+						) 
+				).toList();
+	}
+	
+	public List<Ticket> buscarTicketsSinTecnico(){
+		return repositorioDeTickets.stream().filter(ticket -> ticket.getTecnico() == null).toList();
+	}
+	
+	public int contarTicketsPorEstado(Estado estado) {
+		if (estado == null) {
+	        throw new IllegalArgumentException("El estado no puede ser null");
+	    }
+		return this.buscarTicketsPorEstado(estado).size();
+	}
 
 
 }

@@ -147,5 +147,24 @@ public class Main {
 
      System.out.println("Tickets de prioridad alta:");
      ticketsAlta.forEach(System.out::println);
+     
+  // Consultas: buscar tickets por texto
+     List<Ticket> resultadosTexto =
+             gestor.buscarTicketsPorTexto("sesión");
+
+     System.out.println("Resultados para el texto 'sesión':");
+     resultadosTexto.forEach(System.out::println);
+
+     // Consultas: listar tickets sin técnico
+     List<Ticket> sinTecnico = gestor.buscarTicketsSinTecnico();
+
+     System.out.println("Tickets sin técnico:");
+     sinTecnico.forEach(System.out::println);
+
+     // Consultas: contar tickets abiertos
+     int cantidadAbiertos =
+             gestor.contarTicketsPorEstado(mesaayuda.modulo.Estado.ABIERTO);
+
+     System.out.println("Cantidad de tickets abiertos: " + cantidadAbiertos);
     }
 }
