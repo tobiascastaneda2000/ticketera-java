@@ -1,68 +1,89 @@
 # Mesa de ayuda
 
-Aplicación de consola en Java para gestionar solicitudes de soporte técnico. El proyecto sirve como práctica progresiva de programación orientada a objetos y patrones de diseño vistos en el curso de Fundación Pescar.
+Proyecto de práctica para construir una mesa de ayuda y aprender diseño orientado a objetos, patrones de diseño y desarrollo web con Java. El repositorio contiene el modelo de dominio original y un backend web inicial en Spring Boot. La interfaz React y los endpoints de tickets todavía están planificados.
 
-## Enunciado
+## Objetivo
 
-Una empresa necesita registrar problemas reportados por sus usuarios, asignarlos a técnicos, conversar sobre cada caso y seguir su ciclo de vida. Cada ticket tiene un identificador, título, descripción, prioridad, categoría, fecha de creación, solicitante, técnico opcional, comentarios y estado.
+Una empresa necesita registrar problemas reportados por sus usuarios, asignarlos a técnicos, agregar comentarios y seguir el ciclo de vida de cada ticket. El proyecto avanza por etapas: primero las reglas del dominio y sus patrones; luego una API y persistencia; finalmente una interfaz web.
 
-La aplicación debe permitir crear y consultar tickets, asignarlos, agregar comentarios y cambiar su estado con reglas válidas. A medida que se incorporen patrones, el sistema debe poder elegir cómo asignar técnicos, notificar cambios, decorar tickets con funcionalidades opcionales y guardar/restaurar borradores.
+## Estructura del repositorio
 
-## Cómo leer el proyecto
-
-- `Usuario`, `Tecnico`, `Comentario` y `Ticket` son clases del dominio: representan conceptos del problema.
-- `enum` como `Prioridad` y `Categoria` limitan valores a opciones conocidas.
-- `Ticket` protege sus datos y valida su construcción; su lista de comentarios se expone como solo lectura.
-- `GestorDeTickets` centraliza la creación y guarda los tickets en memoria.
-- `Main` contiene una demostración ejecutable de los comportamientos actuales.
-
-## Patrones practicados
-
-### Singleton — `GestorDeTickets`
-
-`getInstance()` entrega la instancia única del gestor. El constructor es privado para evitar crear gestores por fuera. El repositorio se inicializa al construir el gestor y se expone como lista de solo lectura.
-
-### State — estados de `Ticket`
-
-El estado actual del ticket es un objeto que implementa `EstadoTicket`. Cada estado decide qué significa avanzar o reabrir. La ruta normal es `ABIERTO → EN_CURSO → RESUELTO → CERRADO`; desde `RESUELTO` o `CERRADO` se puede reabrir. Una acción inválida lanza `IllegalStateException`.
-
-Para seguir el flujo, mirá `Ticket.transicionarEstado()`: delega en el estado actual. Luego abrí `EstadoAbierto` y seguí cómo crea el siguiente estado. Así, las reglas quedan repartidas entre estados en vez de crecer en una cadena de `if/else`.
-
-## Guía para ejecutarlo
-
-Es un proyecto Java sencillo importable en Eclipse como proyecto existente. Ejecutá `mesaayuda.app.Main`.
-
-También se puede compilar desde una terminal con un JDK instalado:
-
-```bash
-javac -d bin src/mesaayuda/modulo/*.java src/mesaayuda/app/Main.java
-java -cp bin mesaayuda.app.Main
+```text
+java-gestion-tickets/
+├── src/                       # Aplicación Java de consola y modelo de dominio
+│   └── mesaayuda/
+│       ├── app/                # Main de demostración
+│       └── modulo/             # Tickets, gestor y patrones
+├── test/                      # Pruebas JUnit del modelo de dominio
+│   └── mesaayuda/modulo/
+├── backend/                   # Proyecto Maven con Spring Boot
+│   ├── pom.xml
+│   └── src/
+│       ├── main/java/mesaayuda/api/
+│       ├── main/resources/
+│       └── test/java/mesaayuda/api/
+└── frontend/                  # Reservado para la interfaz React
 ```
 
-No necesita dependencias externas por ahora.
+`src` y `test` en la raíz pertenecen al proyecto de consola original. Spring Boot usa su propia estructura Maven bajo `backend/src/main` y `backend/src/test`. No mezcles las carpetas de ambos proyectos.
 
-## Ruta de práctica
+## Dominio y patrones implementados
 
-1. **Modelo y encapsulamiento (hecho):** entidades, atributos privados, constructores y asociaciones.
-2. **Singleton y State (hecho):** gestor único y ciclo de vida explícito del ticket.
-3. **Strategy (siguiente):** reemplazá el `enum Estrategia` por estrategias intercambiables para asignar un ticket: rotación entre técnicos y técnico con menos tickets abiertos. El gestor debería usar una estrategia sin conocer sus detalles.
-4. **Observer:** avisá al solicitante y al técnico cuando cambie el estado, sin acoplar las notificaciones a `Ticket`.
-5. **Factory Method:** centralizá la creación de tickets según categoría o canal de ingreso.
-6. **Decorator:** agregá capacidades opcionales como seguimiento prioritario o SLA sin llenar `Ticket` de banderas.
-7. **Command:** representá acciones como asignar, resolver y reabrir para poder ejecutarlas desde una interfaz y eventualmente deshacerlas.
-8. **Memento y Builder:** guardá/restaurá borradores y facilitá la construcción de tickets complejos sin constructores largos.
+- **Singleton — `GestorDeTickets`:** un punto de acceso al repositorio en memoria, asignación de IDs, consultas y ejecución de comandos.
+- **State — `Ticket` y `EstadoTicket`:** controla el ciclo `ABIERTO → EN_CURSO → RESUELTO → CERRADO`. Se puede reabrir desde resuelto o cerrado; las transiciones inválidas se rechazan.
+- **Strategy — `EstrategiaAsignacion`:** asignación rotativa o por menor cantidad de tickets activos.
+- **Observer — `ObservadorTicket`:** los notificadores reaccionan a asignaciones, comentarios y cambios de estado.
+- **Command — `ComandoTicket`:** representa acciones como avanzar estado, reabrir y asignar técnico. `GestorDeTickets` registra comandos ejecutados correctamente.
 
-En cada etapa, intentá primero explicar el problema en tus palabras, dibujá las clases principales y recién después codificá. No hace falta memorizar cada línea: buscá identificar quién crea objetos, quién delega comportamiento y quién conoce a quién.
+El gestor también ofrece búsquedas por ID, estado, técnico, prioridad y texto, búsqueda de tickets sin técnico y conteo por estado.
 
-## Ejercicios actuales
+## Aplicación de consola
 
-- Ejecutá `Main` y seguí la salida del caso válido y las dos validaciones.
-- Agregá una transición `ABIERTO → EN_CURSO → RESUELTO → CERRADO` y consultá `getEstado()` en cada paso.
-- Probá avanzar un ticket cerrado y confirmá que se rechaza.
-- Reabrí uno resuelto y uno cerrado; verificá que vuelven a `ABIERTO`.
-- Usá `Usuario.reportarProblema(...)` y luego consultá `GestorDeTickets.getInstance().getRepositorioDeTickets()`.
-- Dibujá el State en UML: `Ticket` mantiene un `EstadoTicket` y delega en sus implementaciones concretas.
+El `Main` original demuestra el modelo, las estrategias, notificaciones y comandos. En Eclipse, ejecutá `mesaayuda.app.Main` desde el proyecto Java original.
 
-## Alcance actual
+Las pruebas del dominio están en `test/mesaayuda/modulo`. En Eclipse, elegí una clase de test y ejecutá **Run As → JUnit Test**.
 
-Los datos viven en memoria y se pierden al cerrar el programa. Todavía no hay interfaz gráfica, base de datos ni sistema de autenticación; primero se practica el diseño del dominio.
+## Backend Spring Boot
+
+El backend se creó con Java 21, Maven y Spring Boot. Por ahora es un esqueleto que arranca el servidor web y configura JPA con H2; todavía no expone endpoints para tickets ni guarda entidades propias.
+
+### Ejecutar desde Eclipse
+
+Importá `backend` como proyecto Maven y ejecutá `MesaAyudaApiApplication` con **Run As → Java Application** (o **Spring Boot App**, si aparece). Spring inicia Tomcat en el puerto `8080`.
+
+### Ejecutar desde Windows
+
+Desde una terminal ubicada en `backend`:
+
+```bat
+mvnw.cmd spring-boot:run
+```
+
+Para compilar y ejecutar las pruebas del backend:
+
+```bat
+mvnw.cmd clean test
+```
+
+El Maven Wrapper (`mvnw.cmd`) usa la versión de Maven configurada para el proyecto; no es necesario instalar Maven globalmente. La primera ejecución puede descargar dependencias.
+
+### Base de datos actual
+
+H2 está configurada en modo memoria (`jdbc:h2:mem`). Spring Boot la inicia al arrancar y los datos se pierden al detener la aplicación. Todavía no hay entidades, repositorios de tickets ni persistencia del dominio.
+
+## Próximos pasos
+
+1. Agregar un endpoint de salud `GET /api/health` y probar la respuesta.
+2. Definir la entidad persistente de ticket y su repositorio JPA.
+3. Crear `GET /api/tickets` y `POST /api/tickets`.
+4. Conectar la creación y listado de tickets con la interfaz React en `frontend`.
+5. Como mejora posterior, cambiar H2 por PostgreSQL y documentar cómo iniciarlo.
+
+## Tecnologías
+
+- Java 21
+- Spring Boot, Spring Web, Spring Data JPA y Jakarta Validation
+- Maven Wrapper
+- H2 (en memoria, etapa inicial)
+- JUnit 5
+- React (planificado)
