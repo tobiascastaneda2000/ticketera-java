@@ -11,16 +11,9 @@ import org.junit.jupiter.api.Test;
 class HistorialComandosTest {
 
     private Ticket crearTicket() {
-        Usuario usuario =
-                new Usuario(1, "Ana Gómez", "ana@empresa.local");
+        Usuario usuario = new Usuario(1, "Ana Gómez", "ana@empresa.local");
 
-        return new Ticket(
-                1,
-                "No puedo iniciar sesión",
-                Prioridad.ALTA,
-                Categoria.CUENTA,
-                usuario
-        );
+        return new Ticket(1, "No puedo iniciar sesión", Prioridad.ALTA, Categoria.CUENTA, usuario);
     }
 
     // Un comando exitoso cambia el ticket y queda registrado en el historial
@@ -54,10 +47,7 @@ class HistorialComandosTest {
 
         ComandoTicket comandoInvalido = new ComandoAvanzarEstado(ticket);
 
-        assertThrows(
-                IllegalStateException.class,
-                () -> gestor.ejecutarComando(comandoInvalido)
-        );
+        assertThrows(IllegalStateException.class, () -> gestor.ejecutarComando(comandoInvalido));
 
         assertEquals(cantidadInicial, gestor.getHistorialComandos().size());
     }
@@ -68,9 +58,6 @@ class HistorialComandosTest {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
         List<ComandoTicket> historial = gestor.getHistorialComandos();
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> historial.clear()
-        );
+        assertThrows(UnsupportedOperationException.class, () -> historial.clear());
     }
 }

@@ -9,13 +9,7 @@ class ComandoTicketTest {
 
     private Ticket crearTicket() {
         Usuario usuario = new Usuario(1, "Ana Gómez", "ana@empresa.local");
-        return new Ticket(
-                1,
-                "No puedo iniciar sesión",
-                Prioridad.ALTA,
-                Categoria.CUENTA,
-                usuario
-        );
+        return new Ticket(1, "No puedo iniciar sesión", Prioridad.ALTA, Categoria.CUENTA, usuario);
     }
 
     // Ejecutar el comando avanza el ticket de ABIERTO a EN_CURSO
@@ -54,8 +48,8 @@ class ComandoTicketTest {
 
         assertThrows(IllegalStateException.class, comando::ejecutarComando);
     }
-    
- // El comando asigna al técnico indicado al ticket
+
+    // El comando asigna al técnico indicado al ticket
     @Test
     void comandoAsignarTecnicoAsignaElTecnico() {
         Ticket ticket = crearTicket();

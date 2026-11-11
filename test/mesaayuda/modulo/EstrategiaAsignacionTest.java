@@ -21,20 +21,13 @@ class EstrategiaAsignacionTest {
     }
 
     private Ticket crearTicket(int id, String titulo) {
-        return new Ticket(
-                id,
-                titulo,
-                Prioridad.MEDIA,
-                Categoria.SOFTWARE,
-                crearSolicitante()
-        );
+        return new Ticket(id, titulo, Prioridad.MEDIA, Categoria.SOFTWARE, crearSolicitante());
     }
 
     // Prueba que la rotativa respete el orden y vuelva al primer técnico
     @Test
     void rotativaReparteEnOrdenYVuelveAlPrimero() {
-        EstrategiaAsignacionRotativa estrategia =
-                new EstrategiaAsignacionRotativa();
+        EstrategiaAsignacionRotativa estrategia = new EstrategiaAsignacionRotativa();
 
         Tecnico ana = crearTecnico(1, "Ana");
         Tecnico luis = crearTecnico(2, "Luis");
@@ -62,26 +55,18 @@ class EstrategiaAsignacionTest {
     // Prueba que la rotativa rechace una lista vacía de técnicos
     @Test
     void rotativaFallaCuandoNoHayTecnicos() {
-        EstrategiaAsignacionRotativa estrategia =
-                new EstrategiaAsignacionRotativa();
+        EstrategiaAsignacionRotativa estrategia = new EstrategiaAsignacionRotativa();
 
         Ticket ticket = crearTicket(1, "Problema sin técnico");
 
-        assertThrows(
-                IllegalStateException.class,
-                () -> estrategia.asignarTecnico(
-                        ticket,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
-        );
+        assertThrows(IllegalStateException.class,
+                () -> estrategia.asignarTecnico(ticket, Collections.emptyList(), Collections.emptyList()));
     }
 
     // Prueba que menor carga elija al técnico con menos tickets activos
     @Test
     void menorCargaEligeAlTecnicoConMenosTicketsActivos() {
-        EstrategiaAsignacionMenorCarga estrategia =
-                new EstrategiaAsignacionMenorCarga();
+        EstrategiaAsignacionMenorCarga estrategia = new EstrategiaAsignacionMenorCarga();
 
         Tecnico ana = crearTecnico(1, "Ana");
         Tecnico luis = crearTecnico(2, "Luis");
@@ -94,16 +79,11 @@ class EstrategiaAsignacionTest {
         activoDeAna2.asignarA(ana);
         activoDeLuis.asignarA(luis);
 
-        List<Ticket> ticketsExistentes =
-                Arrays.asList(activoDeAna1, activoDeAna2, activoDeLuis);
+        List<Ticket> ticketsExistentes = Arrays.asList(activoDeAna1, activoDeAna2, activoDeLuis);
 
         Ticket nuevoTicket = crearTicket(4, "Nuevo problema");
 
-        estrategia.asignarTecnico(
-                nuevoTicket,
-                Arrays.asList(ana, luis),
-                ticketsExistentes
-        );
+        estrategia.asignarTecnico(nuevoTicket, Arrays.asList(ana, luis), ticketsExistentes);
 
         assertEquals(luis, nuevoTicket.getTecnico());
     }
@@ -111,8 +91,7 @@ class EstrategiaAsignacionTest {
     // Prueba que RESUELTO y CERRADO no cuenten como carga activa
     @Test
     void menorCargaIgnoraTicketsResueltosYCerrados() {
-        EstrategiaAsignacionMenorCarga estrategia =
-                new EstrategiaAsignacionMenorCarga();
+        EstrategiaAsignacionMenorCarga estrategia = new EstrategiaAsignacionMenorCarga();
 
         Tecnico ana = crearTecnico(1, "Ana");
         Tecnico luis = crearTecnico(2, "Luis");
@@ -128,16 +107,11 @@ class EstrategiaAsignacionTest {
         cerradoDeLuis.transicionarEstado();
         cerradoDeLuis.transicionarEstado();
 
-        List<Ticket> ticketsExistentes =
-                Arrays.asList(resueltoDeAna, cerradoDeLuis);
+        List<Ticket> ticketsExistentes = Arrays.asList(resueltoDeAna, cerradoDeLuis);
 
         Ticket nuevoTicket = crearTicket(3, "Nuevo problema");
 
-        estrategia.asignarTecnico(
-                nuevoTicket,
-                Arrays.asList(ana, luis),
-                ticketsExistentes
-        );
+        estrategia.asignarTecnico(nuevoTicket, Arrays.asList(ana, luis), ticketsExistentes);
 
         // Ambos tienen cero tickets activos; debe ganar Ana por estar primero
         assertEquals(ana, nuevoTicket.getTecnico());
@@ -146,19 +120,14 @@ class EstrategiaAsignacionTest {
     // Prueba que, si hay empate de carga, gane el primero de la lista
     @Test
     void menorCargaEnEmpateEligeAlPrimero() {
-        EstrategiaAsignacionMenorCarga estrategia =
-                new EstrategiaAsignacionMenorCarga();
+        EstrategiaAsignacionMenorCarga estrategia = new EstrategiaAsignacionMenorCarga();
 
         Tecnico ana = crearTecnico(1, "Ana");
         Tecnico luis = crearTecnico(2, "Luis");
 
         Ticket nuevoTicket = crearTicket(1, "Nuevo problema");
 
-        estrategia.asignarTecnico(
-                nuevoTicket,
-                Arrays.asList(ana, luis),
-                Collections.emptyList()
-        );
+        estrategia.asignarTecnico(nuevoTicket, Arrays.asList(ana, luis), Collections.emptyList());
 
         assertEquals(ana, nuevoTicket.getTecnico());
     }
@@ -166,18 +135,11 @@ class EstrategiaAsignacionTest {
     // Prueba que menor carga rechace una lista vacía de técnicos
     @Test
     void menorCargaFallaCuandoNoHayTecnicos() {
-        EstrategiaAsignacionMenorCarga estrategia =
-                new EstrategiaAsignacionMenorCarga();
+        EstrategiaAsignacionMenorCarga estrategia = new EstrategiaAsignacionMenorCarga();
 
         Ticket ticket = crearTicket(1, "Problema sin técnico");
 
-        assertThrows(
-                IllegalStateException.class,
-                () -> estrategia.asignarTecnico(
-                        ticket,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
-        );
+        assertThrows(IllegalStateException.class,
+                () -> estrategia.asignarTecnico(ticket, Collections.emptyList(), Collections.emptyList()));
     }
 }

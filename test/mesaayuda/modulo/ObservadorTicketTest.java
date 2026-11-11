@@ -23,16 +23,9 @@ class ObservadorTicketTest {
 
     // Crea un ticket de ejemplo para usar en las pruebas
     private Ticket crearTicket() {
-        Usuario solicitante =
-                new Usuario(1, "Ana Gómez", "ana@empresa.local");
+        Usuario solicitante = new Usuario(1, "Ana Gómez", "ana@empresa.local");
 
-        return new Ticket(
-                1,
-                "No puedo iniciar sesión",
-                Prioridad.ALTA,
-                Categoria.CUENTA,
-                solicitante
-        );
+        return new Ticket(1, "No puedo iniciar sesión", Prioridad.ALTA, Categoria.CUENTA, solicitante);
     }
 
     // Comprueba que asignar un técnico avise a los observadores
@@ -83,9 +76,7 @@ class ObservadorTicketTest {
         assertTrue(observador.eventos.get(0).contains("ABIERTO"));
     }
 
-   
-    
- // Al quitar un observador, deja de recibir los eventos siguientes
+    // Al quitar un observador, deja de recibir los eventos siguientes
     @Test
     void observadorQuitadoNoRecibeNotificaciones() {
         Ticket ticket = crearTicket();

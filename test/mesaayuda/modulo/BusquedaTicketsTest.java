@@ -17,13 +17,7 @@ class BusquedaTicketsTest {
     private Ticket crearTicketEnGestor(String titulo) {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        gestor.crearTicket(
-                titulo,
-                "Descripción de prueba",
-                Prioridad.MEDIA,
-                Categoria.SOFTWARE,
-                crearUsuario()
-        );
+        gestor.crearTicket(titulo, "Descripción de prueba", Prioridad.MEDIA, Categoria.SOFTWARE, crearUsuario());
 
         // crearTicket agrega al final del repositorio
         List<Ticket> tickets = gestor.getRepositorioDeTickets();
@@ -46,10 +40,7 @@ class BusquedaTicketsTest {
     void idInexistenteLanzaExcepcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.buscarTicketPorId(-999)
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.buscarTicketPorId(-999));
     }
 
     // La búsqueda por estado incluye el ticket que coincide
@@ -58,8 +49,7 @@ class BusquedaTicketsTest {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
         Ticket ticket = crearTicketEnGestor("Busqueda estado");
 
-        List<Ticket> encontrados =
-                gestor.buscarTicketsPorEstado(Estado.ABIERTO);
+        List<Ticket> encontrados = gestor.buscarTicketsPorEstado(Estado.ABIERTO);
 
         assertTrue(encontrados.contains(ticket));
     }
@@ -69,13 +59,11 @@ class BusquedaTicketsTest {
     void buscaTicketsPorTecnico() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
         Ticket ticket = crearTicketEnGestor("Busqueda técnico");
-        Tecnico tecnico =
-                new Tecnico(8, "Luis Pérez", NivelSoporte.N1);
+        Tecnico tecnico = new Tecnico(8, "Luis Pérez", NivelSoporte.N1);
 
         ticket.asignarA(tecnico);
 
-        List<Ticket> encontrados =
-                gestor.buscarTicketsPorTecnico(tecnico);
+        List<Ticket> encontrados = gestor.buscarTicketsPorTecnico(tecnico);
 
         assertTrue(encontrados.contains(ticket));
     }
@@ -85,10 +73,7 @@ class BusquedaTicketsTest {
     void estadoNullLanzaExcepcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.buscarTicketsPorEstado(null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.buscarTicketsPorEstado(null));
     }
 
     // No se puede buscar por un técnico null
@@ -96,44 +81,31 @@ class BusquedaTicketsTest {
     void tecnicoNullLanzaExcepcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.buscarTicketsPorTecnico(null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.buscarTicketsPorTecnico(null));
     }
-    
-    
- // La búsqueda por técnico devuelve tickets asignados a esa instancia
+
+    // La búsqueda por técnico devuelve tickets asignados a esa instancia
     @Test
     void buscaTicketsPorPrioridad() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        gestor.crearTicket(
-                "Busqueda prioridad alta",
-                "Descripción de prueba",
-                Prioridad.ALTA,
-                Categoria.SOFTWARE,
-                crearUsuario()
-        );
+        gestor.crearTicket("Busqueda prioridad alta", "Descripción de prueba", Prioridad.ALTA, Categoria.SOFTWARE,
+                crearUsuario());
 
         List<Ticket> tickets = gestor.getRepositorioDeTickets();
         Ticket ticketCreado = tickets.get(tickets.size() - 1);
 
-        List<Ticket> encontrados =
-                gestor.buscarTicketsPorPrioridad(Prioridad.ALTA);
+        List<Ticket> encontrados = gestor.buscarTicketsPorPrioridad(Prioridad.ALTA);
 
         assertTrue(encontrados.contains(ticketCreado));
         assertEquals(Prioridad.ALTA, ticketCreado.getPrioridad());
     }
-    
+
     // No se puede buscar por una prioridad null
     @Test
     void prioridadNullLanzaExcepcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.buscarTicketsPorPrioridad(null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.buscarTicketsPorPrioridad(null));
     }
 }

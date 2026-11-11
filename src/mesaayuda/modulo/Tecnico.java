@@ -1,28 +1,26 @@
 package mesaayuda.modulo;
 
-import java.util.List;
-
 public class Tecnico {
-	int id;
+    int id;
     String nombre;
-	NivelSoporte nivel;
-    
+    NivelSoporte nivel;
+
     public Tecnico(int i, String n, NivelSoporte niv) {
-    	this.id = i;
-    	this.nombre = n;
-    	this.nivel = niv;
+        this.id = i;
+        this.nombre = n;
+        this.nivel = niv;
     }
-    
+
     public String getNombre() {
-		return nombre;
-	}
+        return nombre;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public NivelSoporte getNivel() {
-		return nivel;
-	}
-	
+    public NivelSoporte getNivel() {
+        return nivel;
+    }
+
 }

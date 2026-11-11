@@ -14,20 +14,11 @@ class ConsultasTicketsTest {
         return new Usuario(1, "Ana Gómez", "ana@empresa.local");
     }
 
-    private Ticket crearTicket(
-            String titulo,
-            String descripcion,
-            Prioridad prioridad) {
+    private Ticket crearTicket(String titulo, String descripcion, Prioridad prioridad) {
 
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        gestor.crearTicket(
-                titulo,
-                descripcion,
-                prioridad,
-                Categoria.SOFTWARE,
-                crearUsuario()
-        );
+        gestor.crearTicket(titulo, descripcion, prioridad, Categoria.SOFTWARE, crearUsuario());
 
         List<Ticket> repositorio = gestor.getRepositorioDeTickets();
         return repositorio.get(repositorio.size() - 1);
@@ -37,11 +28,7 @@ class ConsultasTicketsTest {
     @Test
     void buscaPorTextoEnTituloSinDistinguirMayusculas() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
-        Ticket ticket = crearTicket(
-                "Error al iniciar sesión",
-                "La cuenta no abre",
-                Prioridad.ALTA
-        );
+        Ticket ticket = crearTicket("Error al iniciar sesión", "La cuenta no abre", Prioridad.ALTA);
 
         List<Ticket> resultados = gestor.buscarTicketsPorTexto("SESIÓN");
 
@@ -52,11 +39,7 @@ class ConsultasTicketsTest {
     @Test
     void buscaPorTextoEnDescripcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
-        Ticket ticket = crearTicket(
-                "Problema de acceso",
-                "La VPN no conecta",
-                Prioridad.MEDIA
-        );
+        Ticket ticket = crearTicket("Problema de acceso", "La VPN no conecta", Prioridad.MEDIA);
 
         List<Ticket> resultados = gestor.buscarTicketsPorTexto("vpn");
 
@@ -67,14 +50,8 @@ class ConsultasTicketsTest {
     @Test
     void buscaPorTextoEnComentarios() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
-        Ticket ticket = crearTicket(
-                "Problema técnico",
-                "La computadora funciona",
-                Prioridad.BAJA
-        );
-        ticket.agregarComentario(
-                new Comentario("Luis", "Revisé el disco rígido")
-        );
+        Ticket ticket = crearTicket("Problema técnico", "La computadora funciona", Prioridad.BAJA);
+        ticket.agregarComentario(new Comentario("Luis", "Revisé el disco rígido"));
 
         List<Ticket> resultados = gestor.buscarTicketsPorTexto("disco");
 
@@ -86,21 +63,14 @@ class ConsultasTicketsTest {
     void textoVacioLanzaExcepcion() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.buscarTicketsPorTexto("   ")
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.buscarTicketsPorTexto("   "));
     }
 
     // Encuentra los tickets que no tienen técnico asignado
     @Test
     void buscaTicketsSinTecnico() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
-        Ticket ticket = crearTicket(
-                "Ticket sin asignar",
-                "Esperando técnico",
-                Prioridad.MEDIA
-        );
+        Ticket ticket = crearTicket("Ticket sin asignar", "Esperando técnico", Prioridad.MEDIA);
 
         assertTrue(gestor.buscarTicketsSinTecnico().contains(ticket));
     }
@@ -109,19 +79,10 @@ class ConsultasTicketsTest {
     @Test
     void cuentaTicketsPorEstado() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
-        Ticket ticket = crearTicket(
-                "Ticket abierto",
-                "Descripción",
-                Prioridad.MEDIA
-        );
+        Ticket ticket = crearTicket("Ticket abierto", "Descripción", Prioridad.MEDIA);
 
-        assertEquals(
-                1,
-                gestor.buscarTicketsPorEstado(Estado.ABIERTO)
-                        .stream()
-                        .filter(encontrado -> encontrado == ticket)
-                        .count()
-        );
+        assertEquals(1, gestor.buscarTicketsPorEstado(Estado.ABIERTO).stream()
+                .filter(encontrado -> encontrado == ticket).count());
     }
 
     // El estado null no es válido para contar
@@ -129,9 +90,6 @@ class ConsultasTicketsTest {
     void estadoNullNoSePuedeContar() {
         GestorDeTickets gestor = GestorDeTickets.getInstance();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> gestor.contarTicketsPorEstado(null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> gestor.contarTicketsPorEstado(null));
     }
 }

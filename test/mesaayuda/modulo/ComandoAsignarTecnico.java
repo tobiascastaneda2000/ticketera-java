@@ -8,16 +8,9 @@ import org.junit.jupiter.api.Test;
 class ComandoAsignarTecnicoTest {
 
     private Ticket crearTicket() {
-        Usuario usuario =
-                new Usuario(1, "Ana Gómez", "ana@empresa.local");
+        Usuario usuario = new Usuario(1, "Ana Gómez", "ana@empresa.local");
 
-        return new Ticket(
-                1,
-                "Problema de acceso",
-                Prioridad.ALTA,
-                Categoria.CUENTA,
-                usuario
-        );
+        return new Ticket(1, "Problema de acceso", Prioridad.ALTA, Categoria.CUENTA, usuario);
     }
 
     // El comando asigna el técnico y queda registrado en el gestor
@@ -27,18 +20,13 @@ class ComandoAsignarTecnicoTest {
         int cantidadInicial = gestor.getHistorialComandos().size();
 
         Ticket ticket = crearTicket();
-        Tecnico tecnico =
-                new Tecnico(1, "Luis Pérez", NivelSoporte.N1);
-        ComandoAsignarTecnico comando =
-                new ComandoAsignarTecnico(ticket, tecnico);
+        Tecnico tecnico = new Tecnico(1, "Luis Pérez", NivelSoporte.N1);
+        ComandoAsignarTecnico comando = new ComandoAsignarTecnico(ticket, tecnico);
 
         gestor.ejecutarComando(comando);
 
         assertEquals(tecnico, ticket.getTecnico());
-        assertEquals(
-                cantidadInicial + 1,
-                gestor.getHistorialComandos().size()
-        );
+        assertEquals(cantidadInicial + 1, gestor.getHistorialComandos().size());
     }
 
     // Un ticket cerrado no puede reasignarse ni agrega el comando al historial
@@ -52,20 +40,12 @@ class ComandoAsignarTecnicoTest {
         ticket.transicionarEstado(); // EN_CURSO -> RESUELTO
         ticket.transicionarEstado(); // RESUELTO -> CERRADO
 
-        Tecnico tecnico =
-                new Tecnico(1, "Luis Pérez", NivelSoporte.N1);
-        ComandoAsignarTecnico comando =
-                new ComandoAsignarTecnico(ticket, tecnico);
+        Tecnico tecnico = new Tecnico(1, "Luis Pérez", NivelSoporte.N1);
+        ComandoAsignarTecnico comando = new ComandoAsignarTecnico(ticket, tecnico);
 
-        assertThrows(
-                IllegalStateException.class,
-                () -> gestor.ejecutarComando(comando)
-        );
+        assertThrows(IllegalStateException.class, () -> gestor.ejecutarComando(comando));
 
-        assertEquals(
-                cantidadInicial,
-                gestor.getHistorialComandos().size()
-        );
+        assertEquals(cantidadInicial, gestor.getHistorialComandos().size());
     }
 
     // El constructor rechaza un técnico null
@@ -73,9 +53,6 @@ class ComandoAsignarTecnicoTest {
     void tecnicoNullNoEsValido() {
         Ticket ticket = crearTicket();
 
-        assertThrows(
-                NullPointerException.class,
-                () -> new ComandoAsignarTecnico(ticket, null)
-        );
+        assertThrows(NullPointerException.class, () -> new ComandoAsignarTecnico(ticket, null));
     }
 }
